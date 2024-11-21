@@ -115,7 +115,6 @@
             ]
         });
 
-
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -191,6 +190,13 @@
             { name: "Hilton Garden Inn Staten Island", price: "$138", coords: [40.61474218416326, -74.17665633292792], color: "yellow" },
             { name: "Hampton Inn & Suites Staten Island", price: "$140", coords: [40.6129567147442, -74.17890966176363], color: "yellow" }
         ];
+        // Additional hotels to add to the map
+const additionalHotels = [
+    { name: "The Algonquin Hotel Times Square", price: "$615", coords: [40.755953701154745, -73.98237857022806], color: "red" },
+    { name: "The Hotel Elysee", price: "$229", coords: [40.759922793775765, -73.97326400562604], color: "orange" },
+    { name: "Washington Square Hotel", price: "$200", coords: [40.732459627399365, -73.99885114255791], color: "orange" },
+    { name: "St. Regis New York", price: "$739", coords: [40.76145071977127, -73.97474691072279], color: "red" }
+];
 
         hotels.forEach(hotel => {
             L.circleMarker(hotel.coords, {
@@ -199,6 +205,14 @@
                 fillOpacity: 0.9
             }).addTo(map).bindPopup(`${hotel.name}: ${hotel.price}`);
         });
+        // Add the additional hotels to the map
+additionalHotels.forEach(hotel => {
+    L.circleMarker(hotel.coords, {
+        color: hotel.color,
+        radius: 8,
+        fillOpacity: 0.9
+    }).addTo(map).bindPopup(`${hotel.name}: ${hotel.price}`);
+});
 
         // Borough percentage legend
         const boroughLegend = L.control({ position: 'bottomleft' });
@@ -241,7 +255,7 @@
             const descriptionBox = document.getElementById("description-box");
             descriptionBox.style.display = descriptionBox.style.display === "none" ? "block" : "none";
         });
-
+        
         // Description Box
         const descriptionBox = document.createElement("div");
         descriptionBox.id = "description-box";
@@ -256,6 +270,18 @@
         document.body.appendChild(descriptionBox);
         // Add scale bar
         L.control.scale().addTo(map);
+        L.geoJSON(NYC_hotels, {
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+            color: feature.properties.color,
+            radius: 8,
+            fillOpacity: 0.9
+        });
+    }
+}).bindPopup(function (layer) {
+    return `${layer.feature.properties.name}: ${layer.feature.properties.price}`;
+}).addTo(map);
+
     </script>
 </body>
 </html>
