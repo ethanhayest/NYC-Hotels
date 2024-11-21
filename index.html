@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Hotel Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        
+         /* Title Styling */
+         .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .author {
+            font-size: 14px;
+            color: #555;
+        }
+
+        #titleBox input:focus {
+            border-bottom: 2px solid #007BFF;
+        }
+
+        .legend {
+            background: white;
+            padding: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            line-height: 18px;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+        
+        /* Button Styling */
+        #info-button {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1000;
+        }
+
+        #info-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Description Box Styling */
+        #description-box {
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            width: 80%;
+            max-width: 600px;
+            z-index: 1000;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div id="map"></div>
+    <!-- Title Box with Author Name -->
+    <div class="title">
+        Finding a Hotel in NYC
+        <div class="author">By Ethan Tilley</div>
+    </div>
+    
+    <script>
+        const map = L.map('map', {
+            center: [40.7128, -74.0060],
+            zoom: 11,
+            maxBounds: [
+                [40.4774, -74.2591], // Southwest corner
+                [40.9176, -73.7004]  // Northeast corner
+            ]
+        });
+
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Borough data with coordinates, percentages, and colors
+        const boroughs = [
+            {
+                name: "Manhattan",
+                coords: [[40.70179570813209, -74.036526307722], [40.76293289197681, -74.01249371610936], [40.88137865501277, -73.93032472800779], [40.872342097503264, -73.90521667723434], [40.83296728763943, -73.93318398429648], [40.803923032631296, -73.92705975666698], [40.795269094340675, -73.91072848298829], [40.732958373629714, -73.96992935284418], [40.70820342637835, -73.97605358112443], [40.69953702019008, -74.01034925584968], [40.70139420216135, -74.02157700650376]],
+                percentage: "73.5%",
+                color: "#08306b"
+            },
+            {
+                name: "Staten Island",
+                coords: [[40.49406444024936, -74.25846219536812], [40.52523297971585, -74.13085729965019], [40.60243336600848, -74.04078325355022], [40.652828693385196, -74.06849834402288], [40.647571827675776, -74.18859706940447], [40.502406737720825, -74.26712315907704], [40.49406444024936, -74.25846219536812]],
+                percentage: "0.9%",
+                color: "#9bbbd3"
+            },
+                {
+                name: "Brooklyn",
+                coords: [
+                    [40.56934772942168, -74.02057906285947],
+                    [40.618014162079184, -74.04339905141498],
+                    [40.64343933499732, -74.03902926637244],
+                    [40.66627688459696, -74.00601311271765],
+                    [40.67879738312592, -74.02057906285947],
+                    [40.70419940320052, -73.99387481940838],
+                    [40.701254737826076, -73.97639567923821],
+                    [40.73202945412114, -73.96139023056472],
+                    [40.68243360448718, -73.89730004671614],
+                    [40.69495106906193, -73.86913920882543],
+                    [40.64294962852717, -73.8549483554526],
+                    [40.616921569710144, -73.89414341267586],
+                    [40.58220171329979, -73.87536244794538],
+                    [40.56934772942168, -74.02057906285947]
+                ],
+                percentage: "8.5%",
+                color: "#3182bd"
+            },
+            {
+                name: "Queens",
+                coords: [[40.53870669086647, -73.95772230638991], [40.597125925170815, -73.72838271785788], [40.76271677971068, -73.68993057127766], [40.807428531103916, -73.7846876467789], [40.74191036062577, -73.97008192493355], [40.685700510931945, -73.90004408651957], [40.697154514179495, -73.87257826753371], [40.59816866231204, -73.84923232139572], [40.553316280126644, -73.95497572449132]],
+                percentage: "15.6%",
+                color: "#3182bd"
+            },
+            {
+                name: "Bronx",
+                coords: [[40.9217102466689, -73.92230553208854], [40.876953290633296, -73.77288535173697], [40.800040185552405, -73.78064270722734], [40.79354945793259, -73.91088461481489], [40.80668884603998, -73.93397850791017], [40.83656687200895, -73.93500847544229], [40.873181560124316, -73.90822930193106], [40.879671413942575, -73.92745537522117]],
+                percentage: "8.5%",
+                color: "#3182bd"
+            }
+        ];
+
+        boroughs.forEach(borough => {
+            L.polygon(borough.coords, { color: borough.color, fillOpacity: 0.7 }).addTo(map)
+                .bindPopup(`${borough.name}: ${borough.percentage} of hotel rooms`);
+        });
+
+        // Hotel markers with colors based on price
+        const hotels = [
+            { name: "The Ritz-Carlton", price: "$1,535", coords: [40.765292892124485, -73.97593449717213], color: "red" },
+            { name: "The Plaza Hotel", price: "$729", coords: [40.76412710981129, -73.97423692876745], color: "red" },
+            { name: "The Standard, High Line", price: "$487", coords: [40.74080298314581, -74.00786595829386], color: "orange" },
+            { name: "The Williamsburg Hotel", price: "$225", coords: [40.72070901728559, -73.95884078006512], color: "orange" },
+            { name: "1 Hotel Brooklyn Bridge", price: "$540", coords: [40.70217186478492, -73.99559616279863], color: "red" },
+            { name: "Wythe Hotel", price: "$277", coords: [40.721895667127555, -73.95814490806636], color: "orange" },
+            { name: "The Boro Hotel", price: "$100", coords: [40.754656012666594, -73.93585284826176], color: "yellow" },
+            { name: "Aloft New York LaGuardia Airport", price: "$193", coords: [40.770485198998394, -73.87042215380717], color: "yellow" },
+            { name: "TWA Hotel", price: "$209", coords: [40.645601417760055, -73.77783464457075], color: "orange" },
+            { name: "Opera House Hotel", price: "$104", coords: [40.815078826201805, -73.91597445850228], color: "yellow" },
+            { name: "Residence Inn by Marriott Bronx", price: "$397", coords: [40.849307345206704, -73.84267907581084], color: "orange" },
+            { name: "Hilton Garden Inn Staten Island", price: "$138", coords: [40.61474218416326, -74.17665633292792], color: "yellow" },
+            { name: "Hampton Inn & Suites Staten Island", price: "$140", coords: [40.6129567147442, -74.17890966176363], color: "yellow" }
+        ];
+
+        hotels.forEach(hotel => {
+            L.circleMarker(hotel.coords, {
+                color: hotel.color,
+                radius: 8,
+                fillOpacity: 0.9
+            }).addTo(map).bindPopup(`${hotel.name}: ${hotel.price}`);
+        });
+
+        // Borough percentage legend
+        const boroughLegend = L.control({ position: 'bottomleft' });
+        boroughLegend.onAdd = function () {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <strong>Hotel Percentage</strong><br>
+                <i style="background: #08306b"></i> 73.5% (Manhattan)<br>
+                <i style="background: #3182bd"></i> 15.6% (Queens)<br>
+                <i style="background: #3182bd"></i> 8.5% (Brooklyn, Bronx)<br>
+                <i style="background: #9bbbd3"></i> 0.9% (Staten Island)
+            `;
+            return div;
+        };
+        boroughLegend.addTo(map);
+
+        // Hotel price legend
+        const priceLegend = L.control({ position: 'bottomright' });
+        priceLegend.onAdd = function () {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <strong>Hotel Prices</strong><br>
+                <i style="background: yellow"></i> $100 - $199<br>
+                <i style="background: orange"></i> $200 - $500<br>
+                <i style="background: red"></i> $500+
+            `;
+            return div;
+        };
+        priceLegend.addTo(map);
+         // Restrict zoom levels
+         map.setMinZoom(9);              // Allows zooming out to see surrounding areas
+        map.setMaxZoom(17);             // Allows zooming in for detailed exploration
+        // Info Button functionality
+        const infoButton = document.createElement("button");
+        infoButton.innerText = "Hotel Information";
+        infoButton.id = "info-button";
+        document.body.appendChild(infoButton);
+
+        infoButton.addEventListener("click", function() {
+            const descriptionBox = document.getElementById("description-box");
+            descriptionBox.style.display = descriptionBox.style.display === "none" ? "block" : "none";
+        });
+
+        // Description Box
+        const descriptionBox = document.createElement("div");
+        descriptionBox.id = "description-box";
+        descriptionBox.innerHTML = `
+            <p>NYC is a popular tourist destination, with numerous hotels located across its boroughs.
+                Thr map shows the most famous hotels such as the Riz Carlton. The purpose of this map is to show the most famous
+                hotel in each borough and give price estimates. 
+            Prices and availability can vary based on location, with Manhattan offering higher-priced options 
+            due to its prime location. Other boroughs like Brooklyn and Queens offer more budget-friendly choices.</p>
+            <p>Information on prices is based on average hotel room rates.</p>
+        `;
+        document.body.appendChild(descriptionBox);
+    </script>
+</body>
+</html>
