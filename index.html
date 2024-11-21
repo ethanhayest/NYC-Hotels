@@ -98,7 +98,11 @@
     <!-- Title Box with Author Name -->
     <div class="title">
         Finding a Hotel in NYC
-        <div class="author">By Ethan Tilley</div>
+    </div>
+    
+    <!-- Author at Bottom Center -->
+    <div class="author">
+        By Ethan Tilley
     </div>
     
     <script>
@@ -250,6 +254,8 @@
             <p>Information on prices is based on average hotel room rates.</p>
         `;
         document.body.appendChild(descriptionBox);
+        // Add scale bar
+        L.control.scale().addTo(map);
     </script>
 </body>
 </html>
