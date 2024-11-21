@@ -3,7 +3,7 @@
 
 ## Project Description
 
-The **NYC Hotel Map** is an interactive web application designed to display the locations of popular hotels across New York City. The map allows users to explore hotels within each of the five boroughs—Manhattan, Brooklyn, Queens, the Bronx, and Staten Island—highlighted with distinct colors representing the percentage of hotel rooms in each borough. The hotels are marked with color-coded circles based on their price range: budget (yellow), mid-range (orange), and luxury (red). 
+The **NYC Hotel Map** is an interactive web application designed to display the locations of popular hotels across New York City. The map allows users to explore hotels within each of the five boroughs—Manhattan, Brooklyn, Queens, the Bronx, and Staten Island—highlighted with distinct colors representing the percentage of hotel rooms in each borough. The hotels are marked with color-coded circles based on their price range: budget (yellow), mid-range (orange), and luxury (red). I included a scale bar, being able to keep the scaling to only focus on NYC. 
 
 ### Major Features:
 - **Interactive Map**: Displays the hotel locations in New York City using Leaflet.js.
